@@ -1,11 +1,11 @@
 # general settings
-name: train_OmniSRModelx4plus_400k-520
-model_type: OmniSRModel
+name: train_OmniSRGANModelx4plus_400k-520
+model_type: OmniSRGANModel
 scale: 4
 num_gpu: auto # auto: can infer from your visible devices automatically. official: 4 GPUs
 manual_seed: 0
 
-# ----------------- options for synthesizing training data in OmniSRModel ----------------- #
+# ----------------- options for synthesizing training data in OmniSRGANModel ----------------- #
 # USM the ground-truth
 l1_gt_usm: False
 percep_gt_usm: False
