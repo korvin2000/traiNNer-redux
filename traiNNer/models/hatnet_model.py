@@ -22,7 +22,7 @@ from ..utils.img_process_util import filter2D
 from ..utils.registry import MODEL_REGISTRY
 
 @MODEL_REGISTRY.register()
-class HATNETModel(SRModel):
+class HATNetModel(SRModel):
 
     """RealESRNet Model for Real-ESRGAN: Training Real-World Blind Super-Resolution with Pure Synthetic Data.
 
@@ -33,7 +33,7 @@ class HATNETModel(SRModel):
     """
 
     def __init__(self, opt):
-        super(HATNETModel, self).__init__(opt)
+        super(HATNetModel, self).__init__(opt)
         self.jpeger = DiffJPEG(differentiable=False).cuda()  # simulate JPEG compression artifacts
         self.usm_sharpener = USMSharp().cuda()  # do usm sharpening
         self.queue_size = opt.get('queue_size', 180)
@@ -196,5 +196,5 @@ class HATNETModel(SRModel):
     def nondist_validation(self, dataloader, current_iter, tb_logger, save_img):
         # do not use the synthetic process during validation
         self.is_train = False
-        super(HATNETModel, self).nondist_validation(dataloader, current_iter, tb_logger, save_img)
+        super(HATNetModel, self).nondist_validation(dataloader, current_iter, tb_logger, save_img)
         self.is_train = True
