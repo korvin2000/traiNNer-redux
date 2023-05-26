@@ -1,6 +1,6 @@
 # general settings
 name: train_OmniSRNetModelx4plus_400k-520
-model_type: OmniSRNetModelx4plus
+model_type: OmniSRNetModel
 scale: 4
 num_gpu: auto # auto: can infer from your visible devices automatically. official: 4 GPUs
 manual_seed: 0
