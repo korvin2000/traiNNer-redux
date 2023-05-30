@@ -1,3 +1,5 @@
+(Fork of BasicSR joeyballentine/traiNNer-redux) Open Source Image and Video Restoration Toolbox for Super-resolution, Denoise, Deblurring, etc. Currently, it includes EDSR, RCAN, SRResNet, SRGAN, ESRGAN, EDVR, BasicVSR, SwinIR, ECBSR, OmniSR, HAT, GRL, etc. Also support StyleGAN2, DFDNet.
+
 NEW ADD ARCH SUPPORT
 - [ESRGAN 8X]
 - [Omnisr](https://github.com/Francis0625/Omni-SR)
