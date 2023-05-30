@@ -9,7 +9,9 @@ from ..metrics import calculate_metric
 from ..utils import get_root_logger, imwrite, tensor2img
 from ..utils.registry import MODEL_REGISTRY
 from .base_model import BaseModel
-
+scaler = torch.cuda.amp.GradScaler()
+autocast = torch.cuda.amp.autocast
+# from flopth import flopth
 
 @MODEL_REGISTRY.register()
 class SRModel(BaseModel):
@@ -20,6 +22,11 @@ class SRModel(BaseModel):
 
         # define network
         self.net_g = build_network(opt['network_g'])
+        # print("==================")
+        # flop, param = flopth(self.net_g, in_size=((3, 64, 64),))
+        # logger = get_root_logger()
+        # logger.info(f"Model flops: {flop}, params: {param}.")
+        # print("==================")
         self.net_g = self.model_to_device(self.net_g)
         self.print_network(self.net_g)
 
@@ -106,42 +113,88 @@ class SRModel(BaseModel):
 
     def optimize_parameters(self, current_iter):
         self.optimizer_g.zero_grad()
-        self.output = self.net_g(self.lq)
+        autoamp_g=False
+        autoamp_g=self.opt['try_autoamp_g']
+        # autoamp=False
+        # autoamp=True
+        if autoamp_g==True:
+            with autocast():
+                self.output = self.net_g(self.lq)
+                l_total = 0
+                loss_dict = OrderedDict()
+                # pixel loss
+                if self.cri_pix:
+                    l_pix = self.cri_pix(self.output, self.gt)
+                    l_total += l_pix
+                    loss_dict['l_pix'] = l_pix
 
-        l_total = 0
-        loss_dict = OrderedDict()
-        # pixel loss
-        if self.cri_pix:
-            l_pix = self.cri_pix(self.output, self.gt)
-            l_total += l_pix
-            loss_dict['l_pix'] = l_pix
+                # perceptual loss
+                if self.cri_perceptual:
+                    l_percep, l_style = self.cri_perceptual(self.output, self.gt)
+                    if l_percep is not None:
+                        l_total += l_percep
+                        loss_dict['l_percep'] = l_percep
+                    if l_style is not None:
+                        l_total += l_style
+                        loss_dict['l_style'] = l_style
 
-        # perceptual loss
-        if self.cri_perceptual:
-            l_percep, l_style = self.cri_perceptual(self.output, self.gt)
-            if l_percep is not None:
-                l_total += l_percep
-                loss_dict['l_percep'] = l_percep
-            if l_style is not None:
-                l_total += l_style
-                loss_dict['l_style'] = l_style
+                    # contextual loss
+                    if self.cri_contextual:
+                        l_contextual = self.cri_contextual(self.output, self.gt)
+                        l_total += l_contextual
+                        loss_dict['l_contextual'] = l_contextual
+                    if self.cri_color:
+                        l_color = self.cri_color(self.output, self.gt)
+                        l_total += l_color
+                        loss_dict['l_color'] = l_color
+                    if self.cri_avg:
+                        l_avg = self.cri_avg(self.output, self.gt)
+                        l_total += l_avg
+                        loss_dict['l_avg'] = l_avg
+                scaler.scale(l_total).backward()
 
-            # contextual loss
-            if self.cri_contextual:
-                l_contextual = self.cri_contextual(self.output, self.gt)
-                l_total += l_contextual
-                loss_dict['l_contextual'] = l_contextual
-            if self.cri_color:
-                l_color = self.cri_color(self.output, self.gt)
-                l_total += l_color
-                loss_dict['l_color'] = l_color
-            if self.cri_avg:
-                l_avg = self.cri_avg(self.output, self.gt)
-                l_total += l_avg
-                loss_dict['l_avg'] = l_avg
+                scaler.step(self.optimizer_g)
 
-        l_total.backward()
-        self.optimizer_g.step()
+                scaler.update()
+
+                # l_total.backward()
+                # self.optimizer_g.step()
+        else:
+            self.output = self.net_g(self.lq)
+            l_total = 0
+            loss_dict = OrderedDict()
+            # pixel loss
+            if self.cri_pix:
+                l_pix = self.cri_pix(self.output, self.gt)
+                l_total += l_pix
+                loss_dict['l_pix'] = l_pix
+
+            # perceptual loss
+            if self.cri_perceptual:
+                l_percep, l_style = self.cri_perceptual(self.output, self.gt)
+                if l_percep is not None:
+                    l_total += l_percep
+                    loss_dict['l_percep'] = l_percep
+                if l_style is not None:
+                    l_total += l_style
+                    loss_dict['l_style'] = l_style
+
+                # contextual loss
+                if self.cri_contextual:
+                    l_contextual = self.cri_contextual(self.output, self.gt)
+                    l_total += l_contextual
+                    loss_dict['l_contextual'] = l_contextual
+                if self.cri_color:
+                    l_color = self.cri_color(self.output, self.gt)
+                    l_total += l_color
+                    loss_dict['l_color'] = l_color
+                if self.cri_avg:
+                    l_avg = self.cri_avg(self.output, self.gt)
+                    l_total += l_avg
+                    loss_dict['l_avg'] = l_avg
+
+            l_total.backward()
+            self.optimizer_g.step()
 
         self.log_dict = self.reduce_loss_dict(loss_dict)
 
