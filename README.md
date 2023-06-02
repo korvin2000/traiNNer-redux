@@ -12,7 +12,7 @@ NEW ADD ARCH SUPPORT
 - [ESWT](https://github.com/Fried-Rice-Lab/FriedRiceLab)
   - The arch implementation of ESWT is from [ESWT](https://github.com/Fried-Rice-Lab/FriedRiceLab). The LICENSE of ESWT is [MIT License]. 
 - [SRFormer](https://github.com/HVision-NKU/SRFormer)
-  - The arch implementation of SRFormer is from [SRFormer](https://github.com/HVision-NKU/SRFormer). The LICENSE of ESWT is [Apache License 2.0]. 
+  - The arch implementation of SRFormer is from [SRFormer](https://github.com/HVision-NKU/SRFormer). The LICENSE of SRFormer is [Apache License 2.0]. 
 
 ***************************
 NEW FEATURE SUPPORT
