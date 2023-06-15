@@ -1,4 +1,4 @@
-(Fork of BasicSR joeyballentine/traiNNer-redux) Open Source Image and Video Restoration Toolbox for Super-resolution, Denoise, Deblurring, etc. Currently, it includes EDSR, RCAN, SRResNet, SRGAN, ESRGAN, EDVR, BasicVSR, SwinIR, ECBSR, OmniSR, HAT, GRL, etc. Also support StyleGAN2, DFDNet.
+(Fork of BasicSR joeyballentine/traiNNer-redux) Open Source Image and Video Restoration Toolbox for Super-resolution, Denoise, Deblurring, etc. Currently, it includes EDSR, RCAN, SRResNet, SRGAN, ESRGAN, EDVR, BasicVSR, SwinIR, ECBSR, OmniSR, HAT, GRL, A-ESRGAN, etc. Also support StyleGAN2, DFDNet.
 
 ***************************
 NEW ADD ARCH SUPPORT
@@ -13,7 +13,8 @@ NEW ADD ARCH SUPPORT
   - The arch implementation of ESWT is from [ESWT](https://github.com/Fried-Rice-Lab/FriedRiceLab). The LICENSE of ESWT is [MIT License]. 
 - [SRFormer](https://github.com/HVision-NKU/SRFormer)
   - The arch implementation of SRFormer is from [SRFormer](https://github.com/HVision-NKU/SRFormer). The LICENSE of SRFormer is [Apache License 2.0]. 
-
+- [A-ESRGAN](https://github.com/stroking-fishes-ml-corp/A-ESRGAN)
+  - The arch implementation of A-ESRGAN is from [A-ESRGAN](https://github.com/stroking-fishes-ml-corp/A-ESRGAN). The LICENSE of A-ESRGAN is [BSD 3-Clause "New" or "Revised" License]. 
 ***************************
 NEW FEATURE SUPPORT
 -  ContextualLoss weight
