@@ -29,7 +29,7 @@ TIPS
 - PairedImageDataset set high_order_degradation : False
 - RealESRGANDataset set high_order_degradation : True
 - To use Automatic mixed precision, edit the yml files in options\train\ESWT\ 
-- e.g.  if you want use omnisr-gan with amp, just edit the trainESWTGAN_SRx4_scratch-DIV2K.yml 's following part
+- e.g.  if you want use omnisr-gan with amp, just edit the 4x_trainESWTGAN_SR_scratch-DIV2K.yml 's following part
 ```
 name: train_ESWTGANModel_SRx4_scratch_P48W8_DIV2K_500k_B4G8
 try_autoamp_g: True # enable amp Automatic mixed precision for network_g. if loss inf or nan or error just set to False
@@ -48,4 +48,43 @@ network_g:
   window_size: 8
   pe: True
   ffn_bias: True
+```
+- If you want to use aesrgan's network_d for other network_d. you should edit the [4x_train_multiaesrgan_plus.yml](https://github.com/FlotingDream/traiNNer-redux-FJ/blob/master/options/train/AESRGAN/4x_train_multiaesrgan_plus.yml)
+- e.g. if you want use omnisr as network_g and multiscale as network_d, just edit the 4x_train_multiaesrgan_plus.yml 's following part
+```
+# network structures
+# network_g:
+#   type: RRDBNet
+#   num_in_ch: 3
+#   num_out_ch: 3
+#   num_feat: 64
+#   num_block: 23
+#   num_grow_ch: 32
+
+network_g:
+  type: OmniSRNet
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 64
+  upsampling: 4
+  res_num: 5
+  block_num: 1
+  bias: True
+  block_script_name: OSA
+  block_class_name: OSA_Block
+  window_size: 8
+  pe: True
+  ffn_bias: True
+
+#network_d:
+#  type: UNetDiscriminatorAesrgan
+#  num_in_ch: 3
+#  num_feat: 64
+#  skip_connection: True
+
+network_d:
+  type: multiscale
+  num_in_ch: 3
+  num_feat: 64
+  num_D: 2
 ```
