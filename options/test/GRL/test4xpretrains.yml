@@ -1,0 +1,189 @@
+
+# general settings
+name: GRLpretrainSmall
+model_type: GeneralGANModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+datasets:
+  test:
+    name: Set5
+    type: PairedImageDataset
+    dataroot_gt: /home/phips/Documents/datasets/Set5/original
+    dataroot_lq: /home/phips/Documents/datasets/Set5/LRbicx4
+    io_backend:
+      type: disk
+
+# network structure
+network_g:
+
+  # type: RRDBNet
+  # num_in_ch: 3
+  # num_out_ch: 3
+  # num_feat: 64
+  # num_block: 23
+  # num_grow_ch: 32
+
+  # type: SwinIR
+  # upscale: 4
+  # in_chans: 3
+  # img_size: 48
+  # window_size: 8
+  # img_range: 1.
+  # depths: [6, 6, 6, 6, 6, 6]
+  # embed_dim: 180
+  # num_heads: [6, 6, 6, 6, 6, 6]
+  # mlp_ratio: 2
+  # upsampler: 'pixelshuffle'
+  # resi_connection: '1conv'
+
+  # type: HAT
+  # upscale: 4
+  # in_chans: 3
+  # img_size: 64
+  # window_size: 16
+  # compress_ratio: 3
+  # squeeze_factor: 30
+  # conv_scale: 0.01
+  # overlap_ratio: 0.5
+  # img_range: 1.
+  # depths: [6, 6, 6, 6, 6, 6]
+  # embed_dim: 180
+  # num_heads: [6, 6, 6, 6, 6, 6]
+  # mlp_ratio: 2
+  # upsampler: 'pixelshuffle'
+  # resi_connection: '1conv'
+
+  # type: OmniSRNet
+  # num_in_ch: 3
+  # num_out_ch: 3
+  # num_feat: 64
+  # upsampling: 4
+  # res_num: 5
+  # block_num: 1
+  # bias: True
+  # block_script_name: OSA
+  # block_class_name: OSA_Block
+  # window_size: 8
+  # pe: True
+  # ffn_bias: True
+
+  type: GRL
+
+  ## GRL base
+  # upscale: 4
+  # in_channels: 3
+  # embed_dim: 180 
+  # img_range: 1.
+  # img_size: 160 #input image size = gt_size/upscale = 640/4=160
+  # upsampler: pixelshuffle
+  # depths: [4, 4, 8, 8, 8, 4, 4]
+  # num_heads_window: [3, 3, 3, 3, 3, 3, 3]
+  # num_heads_stripe: [3, 3, 3, 3, 3, 3, 3]
+  # window_size: 8
+  # stripe_size: [8, null]
+  # stripe_groups: [null, 4]
+  # stripe_shift: True
+  # mlp_ratio: 2
+  # qkv_proj_type: "linear"
+  # anchor_proj_type: "avgpool"
+  # anchor_one_stage: True
+  # anchor_window_down_factor: 4
+  # out_proj_type: "linear"
+  # conv_type: "1conv"
+  # init_method: "n"
+  # fairscale_checkpoint: False
+  # offload_to_cpu: False
+  # double_window: False
+  # stripe_square: False
+  # separable_conv_act: True
+  # local_connection: True
+  # use_buffer: True
+  # use_efficient_buffer: True
+  # euclidean_dist: False
+
+  ## GRL small
+  upscale: 4
+  in_channels: 3
+  embed_dim: 128
+  img_range: 1.
+  img_size: 160 #input image size = gt_size/upscale = 640/4=160
+  upsampler: pixelshuffle
+  depths: [4, 4, 4, 4]
+  num_heads_window: [2, 2, 2, 2]
+  num_heads_stripe: [2, 2, 2, 2]
+  window_size: 8
+  stripe_size: [8, null]
+  stripe_groups: [null, 4]
+  stripe_shift: True
+  mlp_ratio: 2
+  qkv_proj_type: "linear"
+  anchor_proj_type: "avgpool"
+  anchor_one_stage: True
+  anchor_window_down_factor: 4
+  out_proj_type: "linear"
+  conv_type: "1conv"
+  init_method: "n"
+  fairscale_checkpoint: False
+  offload_to_cpu: False
+  double_window: False
+  stripe_square: False
+  separable_conv_act: True
+  local_connection: False
+  use_buffer: True
+  use_efficient_buffer: True
+  euclidean_dist: False
+
+  ## GRL tiny
+  # upscale: 4
+  # in_channels: 3
+  # embed_dim: 64
+  # img_range: 1.
+  # img_size: 160 #input image size = gt_size/upscale = 640/4=160
+  # upsampler: pixelshuffledirect
+  # depths: [4, 4, 4, 4]
+  # num_heads_window: [2, 2, 2, 2]
+  # num_heads_stripe: [2, 2, 2, 2]
+  # window_size: 8
+  # stripe_size: [8, null]
+  # stripe_groups: [null, 4]
+  # stripe_shift: True
+  # mlp_ratio: 2
+  # qkv_proj_type: "linear"
+  # anchor_proj_type: "avgpool"
+  # anchor_one_stage: True
+  # anchor_window_down_factor: 4
+  # out_proj_type: "linear"
+  # conv_type: "1conv"
+  # init_method: "n"
+  # fairscale_checkpoint: False
+  # offload_to_cpu: False
+  # double_window: False
+  # stripe_square: False
+  # separable_conv_act: True
+  # local_connection: False
+  # use_buffer: True
+  # use_efficient_buffer: True
+  # euclidean_dist: False
+
+# path
+path:
+  pretrain_network_g: /home/phips/Downloads/sr_grl_small_c3x4.ckpt
+  #param_key_g: params_ema
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: false
