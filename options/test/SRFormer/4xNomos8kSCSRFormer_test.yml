@@ -1,0 +1,54 @@
+name: 4xNomos8kSCSRFormer
+model_type: GeneralGANModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+tile: # use the tile mode for limited GPU memory when testing.
+  tile_size: 256 # the higher, the more utilized GPU memory and the less performance change against the full image. must be an integer multiple of the window size.
+  tile_pad: 32 # overlapping between adjacency patches.must be an integer multiple of the window size.
+
+datasets:
+  test:
+    name: SELFTRAINED_TEST
+    type: PairedImageDataset
+    dataroot_gt: /home/phips/Documents/datasets/selfpage_testimages/4xlanczos_single
+    dataroot_lq: /home/phips/Documents/datasets/selfpage_testimages/lr_single
+    io_backend:
+      type: disk
+      
+# network structures
+network_g:
+  type: SRFormer
+  upscale: 4
+  in_chans: 3
+  img_size: 48
+  window_size: 22
+  img_range: 1.
+  depths: [6, 6, 6, 6, 6, 6]
+  embed_dim: 180
+  num_heads: [6, 6, 6, 6, 6, 6]
+  mlp_ratio: 2
+  upsampler: 'pixelshuffle'
+  resi_connection: '1conv'
+
+# path
+path:
+  pretrain_network_g: /home/phips/Downloads/net_g_75000.pth
+  param_key_g: params_ema
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: false
