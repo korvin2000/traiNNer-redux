@@ -1,0 +1,74 @@
+name: 4xNomos8kSCGRL
+model_type: GeneralGANModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+datasets:
+  test:
+    name: UPSCALE_TEST
+    type: PairedImageDataset
+    #dataroot_gt: /home/phips/Documents/datasets/HFA2k_LUDVAE/VAL_HR
+    #dataroot_lq: /home/phips/Documents/datasets/HFA2k_LUDVAE/VAL_LR
+    dataroot_gt: /home/phips/Documents/datasets/selfpage_testimages/single_hr
+    dataroot_lq: /home/phips/Documents/datasets/selfpage_testimages/single_lr
+    io_backend:
+      type: disk
+      
+# network structures
+network_g:
+  type: GRL
+  upscale: 4
+  in_channels: 3
+  embed_dim: 180 
+  img_range: 1.
+  img_size: 32 #input image size = gt_size/upscale = 640/4=160
+  upsampler: pixelshuffle
+  depths: [4, 4, 8, 8, 8, 4, 4]
+  num_heads_window: [3, 3, 3, 3, 3, 3, 3]
+  num_heads_stripe: [3, 3, 3, 3, 3, 3, 3]
+  window_size: 8
+  stripe_size: [8, null]
+  stripe_groups: [null, 4]
+  stripe_shift: True
+  mlp_ratio: 2
+  qkv_proj_type: "linear"
+  anchor_proj_type: "avgpool"
+  anchor_one_stage: True
+  anchor_window_down_factor: 4
+  out_proj_type: "linear"
+  conv_type: "1conv"
+  init_method: "n"
+  fairscale_checkpoint: False
+  offload_to_cpu: False
+  double_window: False
+  stripe_square: False
+  separable_conv_act: True
+  local_connection: True
+  use_buffer: True
+  use_efficient_buffer: True
+  euclidean_dist: False
+
+# path
+path:
+  pretrain_network_g: /home/phips/Documents/traiNNer-redux-FJ/experiments/pretrained_models/GRL_base_net_g_5000.pth
+  param_key_g: params_ema
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: false
+
+  backend: nccl
+  port: 29500

@@ -1,0 +1,47 @@
+name: EDSR_M
+model_type: SRModel
+scale: 4
+num_gpu: 1  # set num_gpu: 0 for cpu mode
+manual_seed: 0
+
+datasets:
+  test:
+    name: LUDVAE_TEST
+    type: PairedImageDataset
+    dataroot_gt: /home/phips/Documents/datasets/HFA2k_LUDVAE/VAL_HR
+    dataroot_lq: /home/phips/Documents/datasets/HFA2k_LUDVAE/VAL_LR
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+  type: EDSR
+  num_in_ch: 3
+  num_out_ch: 3
+  num_feat: 64
+  num_block: 16
+  upscale: 4
+  res_scale: 1
+  img_range: 255.
+  rgb_mean: [0.4488, 0.4371, 0.4040]
+
+# path
+path:
+  pretrain_network_g: /home/phips/Documents/traiNNer-redux-FJ/experiments/test_EDSR_M/models/net_g_1000.pth
+  strict_load_g: true
+  param_key_g: params_ema
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: false
