@@ -1,0 +1,50 @@
+name: 4xSwinIR
+model_type: SwinIRModel
+scale: 4
+num_gpu: 1
+manual_seed: 0
+
+datasets:
+  test:
+    name: LUDVAE_TEST
+    type: PairedImageDataset
+    dataroot_gt: /home/phips/Documents/datasets/HFA2k_LUDVAE/VAL_HR
+    dataroot_lq: /home/phips/Documents/datasets/HFA2k_LUDVAE/VAL_LR
+    io_backend:
+      type: disk
+      
+# network structures
+network_g:
+  type: SwinIR
+  upscale: 4
+  in_chans: 3
+  img_size: 48
+  window_size: 8
+  img_range: 1.
+  depths: [6, 6, 6, 6, 6, 6]
+  embed_dim: 180
+  num_heads: [6, 6, 6, 6, 6, 6]
+  mlp_ratio: 2
+  upsampler: 'pixelshuffle'
+  resi_connection: '1conv'
+
+# path
+path:
+  pretrain_network_g: /home/phips/Downloads/001_classicalSR_DIV2K_s48w8_SwinIR-M_x4.pth
+  param_key_g: params_ema
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: false
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: false
