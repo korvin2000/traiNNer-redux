@@ -422,9 +422,9 @@ class BaseModel():
             logger.info("Batch augmentations enabled")
 
     def setup_unshuffle(self):
-        unshuffle_scale = self.opt.get("unshuffle_scale")
-        unshuffle = self.opt.get("use_unshuffle")
-        if unshuffle and unshuffle_scale:
+        unshuffle_scale = self.opt.get("unshuffle_scale", None)
+        unshuffle = self.opt.get("use_unshuffle", None)
+        if unshuffle and unshuffle_scale is not None:
             self.unshuffle = SpaceToDepth(unshuffle_scale)
             logger.info("Pixel Unshuffle wrapper enabled. "
                         f"Scale: {unshuffle_scale}")
