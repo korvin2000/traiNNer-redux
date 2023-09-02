@@ -14,7 +14,9 @@ NEW ADD ARCH SUPPORT
 - [SRFormer](https://github.com/HVision-NKU/SRFormer)
   - The arch implementation of SRFormer is from [SRFormer](https://github.com/HVision-NKU/SRFormer). The LICENSE of SRFormer is [Apache License 2.0]. 
 - [A-ESRGAN](https://github.com/stroking-fishes-ml-corp/A-ESRGAN)
-  - The arch implementation of A-ESRGAN is from [A-ESRGAN](https://github.com/stroking-fishes-ml-corp/A-ESRGAN). The LICENSE of A-ESRGAN is [BSD 3-Clause "New" or "Revised" License]. 
+  - The arch implementation of A-ESRGAN is from [A-ESRGAN](https://github.com/stroking-fishes-ml-corp/A-ESRGAN). The LICENSE of A-ESRGAN is [BSD 3-Clause "New" or "Revised" License].
+- [DAT](https://github.com/zhengchen1999/DAT)
+  - The arch implementation of DAT is from [A-ESRGAN](https://github.com/zhengchen1999/DAT). The LICENSE of DAT is [Apache License 2.0]. 
 ***************************
 NEW FEATURE SUPPORT
 -  ContextualLoss weight
@@ -28,10 +30,11 @@ NEW FEATURE SUPPORT
 TIPS
 - PairedImageDataset set high_order_degradation : False
 - RealESRGANDataset set high_order_degradation : True
-- To use Automatic mixed precision, edit the yml files in options\train\ESWT\ 
-- e.g.  if you want use omnisr-gan with amp, just edit the 4x_trainESWTGAN_SR_scratch-DIV2K.yml 's following part
+- model_type can use GeneralGANModel or GeneralNetModel for ,ost of archs
+- To use Automatic mixed precision, edit the yml
+- e.g.  if you want use omnisr-gan with amp, just use model_type: GeneralGANModel and edit the .yml 's following part
 ```
-name: train_ESWTGANModel_SRx4_scratch_P48W8_DIV2K_500k_B4G8
+name: train_OmniSRGANModel_SRx4_scratch_P48W8_DIV2K_500k_B4G8
 try_autoamp_g: True # enable amp Automatic mixed precision for network_g. if loss inf or nan or error just set to False
 try_autoamp_d: True # enable amp Automatic mixed precision for network_d. if loss inf or nan or error just set to False
 network_g:
@@ -53,13 +56,6 @@ network_g:
 - e.g. if you want use omnisr as network_g and multiscale as network_d, just edit the .yml 's following part
 ```
 # network structures
-# network_g:
-#   type: RRDBNet
-#   num_in_ch: 3
-#   num_out_ch: 3
-#   num_feat: 64
-#   num_block: 23
-#   num_grow_ch: 32
 
 network_g:
   type: OmniSRNet
@@ -76,15 +72,28 @@ network_g:
   pe: True
   ffn_bias: True
 
-#network_d:
-#  type: UNetDiscriminatorAesrgan
-#  num_in_ch: 3
-#  num_feat: 64
-#  skip_connection: True
-
 network_d:
   type: multiscale
   num_in_ch: 3
   num_feat: 64
   num_D: 2
+```
+***************************
+for easy use here are examples for network_g
+```
+# network structures
+network_g:
+  # DAT-S, nees to set batch size >1
+  type: DAT
+  upscale: 4
+  in_chans: 3
+  img_size: 64
+  img_range: 1.
+  split_size: [8,16]
+  depth: [6,6,6,6,6,6]
+  embed_dim: 180
+  num_heads: [6,6,6,6,6,6]
+  expansion_factor: 2
+  resi_connection: '1conv'
+
 ```
