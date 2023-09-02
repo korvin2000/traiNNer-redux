@@ -16,7 +16,11 @@ NEW ADD ARCH SUPPORT
 - [A-ESRGAN](https://github.com/stroking-fishes-ml-corp/A-ESRGAN)
   - The arch implementation of A-ESRGAN is from [A-ESRGAN](https://github.com/stroking-fishes-ml-corp/A-ESRGAN). The LICENSE of A-ESRGAN is [BSD 3-Clause "New" or "Revised" License].
 - [DAT](https://github.com/zhengchen1999/DAT)
-  - The arch implementation of DAT is from [A-ESRGAN](https://github.com/zhengchen1999/DAT). The LICENSE of DAT is [Apache License 2.0]. 
+  - The arch implementation of DAT is from [DAT](https://github.com/zhengchen1999/DAT). The LICENSE of DAT is [Apache License 2.0].
+- [WaveMixSR](https://github.com/pranavphoenix/WaveMixSR)
+  - The arch implementation of WaveMixSR is from [WaveMixSR](https://github.com/pranavphoenix/WaveMixSR). The LICENSE of WaveMixSR is [MIT License].
+
+
 ***************************
 NEW FEATURE SUPPORT
 -  ContextualLoss weight
@@ -96,4 +100,11 @@ network_g:
   expansion_factor: 2
   resi_connection: '1conv'
 
+  type: WaveMixSR
+  scale: 4
+  depth: 4
+  mult: 1
+  ff_channel: 144
+  final_dim: 144
+  dropout: 0.3
 ```
