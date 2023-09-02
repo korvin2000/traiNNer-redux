@@ -19,6 +19,8 @@ NEW ADD ARCH SUPPORT
   - The arch implementation of DAT is from [DAT](https://github.com/zhengchen1999/DAT). The LICENSE of DAT is [Apache License 2.0].
 - [WaveMixSR](https://github.com/pranavphoenix/WaveMixSR)
   - The arch implementation of WaveMixSR is from [WaveMixSR](https://github.com/pranavphoenix/WaveMixSR). The LICENSE of WaveMixSR is [MIT License].
+- [StarSRGAN](https://github.com/kynthesis/StarSRGAN)
+  - The arch implementation of StarSRGAN is from [StarSRGAN](https://github.com/kynthesis/StarSRGAN). The LICENSE of StarSRGAN is [Apache License 2.0].
 
 
 ***************************
@@ -107,4 +109,13 @@ network_g:
   ff_channel: 144
   final_dim: 144
   dropout: 0.3
+
+  type: StarSRNet
+  num_in_ch: 3
+  num_out_ch: 3
+  scale: 4
+  num_feat: 64
+  num_block: 23
+  num_grow_ch: 32
+  drop_out: False
 ```
