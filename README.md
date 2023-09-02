@@ -1,4 +1,4 @@
-(Fork of BasicSR joeyballentine/traiNNer-redux) Open Source Image and Video Restoration Toolbox for Super-resolution, Denoise, Deblurring, etc. Currently, it includes EDSR, RCAN, SRResNet, SRGAN, ESRGAN, EDVR, BasicVSR, SwinIR, ECBSR, OmniSR, HAT, GRL, A-ESRGAN, etc. Also support StyleGAN2, DFDNet.
+(Fork of BasicSR joeyballentine/traiNNer-redux) Open Source Image and Video Restoration Toolbox for Super-resolution, Denoise, Deblurring, etc. Currently, it includes EDSR, RCAN, SRResNet, SRGAN, ESRGAN, EDVR, BasicVSR, SwinIR, ECBSR, OmniSR, HAT, GRL, A-ESRGAN, DAT, WaveMixSR, StarSRGAN, DLGSANet etc. Also support StyleGAN2, DFDNet.
 
 ***************************
 NEW ADD ARCH SUPPORT
@@ -21,7 +21,8 @@ NEW ADD ARCH SUPPORT
   - The arch implementation of WaveMixSR is from [WaveMixSR](https://github.com/pranavphoenix/WaveMixSR). The LICENSE of WaveMixSR is [MIT License].
 - [StarSRGAN](https://github.com/kynthesis/StarSRGAN)
   - The arch implementation of StarSRGAN is from [StarSRGAN](https://github.com/kynthesis/StarSRGAN). The LICENSE of StarSRGAN is [Apache License 2.0].
-
+- [DLGSANet](https://github.com/NeonLeexiang/DLGSANet)
+  - The arch implementation of DLGSANet is from [DLGSANet](https://github.com/NeonLeexiang/DLGSANet). The LICENSE of DLGSANet is [Apache License 2.0].
 
 ***************************
 NEW FEATURE SUPPORT
@@ -118,4 +119,26 @@ network_g:
   num_block: 23
   num_grow_ch: 32
   drop_out: False
+
+  type: DLGSANet
+  upscale: 4
+  in_chans: 3
+  dim: 90
+  groups: 3
+  blocks: 2
+  buildblock_type: 'sparseedge'
+  window_size: 7
+  idynamic_num_heads: 6
+  idynamic_ffn_type: 'GDFN'
+  idynamic_ffn_expansion_factor: 2.
+  idynamic: true
+  restormer_num_heads: 6
+  restormer_ffn_type: 'GDFN'
+  restormer_ffn_expansion_factor: 2.
+  tlc_flag: true
+  tlc_kernel: 48    # using tlc during validation
+  activation: 'relu'
+  body_norm: false
+  img_range: 1.
+  upsampler: 'pixelshuffledirect'
 ```
