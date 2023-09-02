@@ -264,3 +264,30 @@ class UNetDiscriminatorSN(nn.Module):
         out = self.conv9(out)
 
         return out
+
+@ARCH_REGISTRY.register()
+class multiscale(nn.Module):
+    def __init__(self, num_in_ch, num_feat=64, num_D=2):
+        super(multiscale, self).__init__()
+        self.num_D = num_D
+
+        for i in range(num_D):
+            netD = UNetDiscriminatorSN(num_in_ch, num_feat=num_feat)
+            setattr(self, 'layer' + str(i), netD)
+
+        self.downsample = nn.AvgPool2d(
+            4, stride=2, padding=[1, 1])
+
+    def singleD_forward(self, model, input):
+        return model(input)
+
+    def forward(self, input):
+        num_D = self.num_D
+        result = []
+        input_downsampled = input
+        for i in range(num_D):
+            model = getattr(self, 'layer' + str(num_D - 1 - i))
+            result.append(self.singleD_forward(model, input_downsampled))
+            if i != (num_D - 1):
+                input_downsampled = self.downsample(input_downsampled)
+        return result
