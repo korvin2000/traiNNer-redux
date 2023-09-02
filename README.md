@@ -9,7 +9,7 @@ NEW ADD ARCH SUPPORT
   - The arch implementation of HAT is from [HAT](https://github.com/XPixelGroup/HAT). The LICENSE of HAT is [MIT License]. The LICENSE is included as [LICENSE_HAT](LICENSE/LICENSE_HAT).
 - [GRL](https://github.com/ofsoundof/GRL-Image-Restoration/tree/main)
   - The arch implementation of GRL is from [GRL](https://github.com/ofsoundof/GRL-Image-Restoration/tree/main). The LICENSE of GRL is [MIT License]. 
-- [ESWT](https://github.com/Fried-Rice-Lab/FriedRiceLab)
+- [ESWT](https://github.com/Fried-Rice-Lab/FriedRiceLab) # have bug
   - The arch implementation of ESWT is from [ESWT](https://github.com/Fried-Rice-Lab/FriedRiceLab). The LICENSE of ESWT is [MIT License]. 
 - [SRFormer](https://github.com/HVision-NKU/SRFormer)
   - The arch implementation of SRFormer is from [SRFormer](https://github.com/HVision-NKU/SRFormer). The LICENSE of SRFormer is [Apache License 2.0]. 
@@ -83,7 +83,7 @@ for easy use here are examples for network_g
 ```
 # network structures
 network_g:
-  # DAT-S, nees to set batch size >1
+  # DAT-S, need to set batch size >1
   type: DAT
   upscale: 4
   in_chans: 3
