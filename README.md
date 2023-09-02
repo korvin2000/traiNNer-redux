@@ -49,8 +49,8 @@ network_g:
   pe: True
   ffn_bias: True
 ```
-- If you want to use aesrgan's network_d for other network_d. you should edit the [4x_train_multiaesrgan_plus.yml](https://github.com/FlotingDream/traiNNer-redux-FJ/blob/master/options/train/AESRGAN/4x_train_multiaesrgan_plus.yml)
-- e.g. if you want use omnisr as network_g and multiscale as network_d, just edit the 4x_train_multiaesrgan_plus.yml 's following part
+- If you want to use aesrgan's network_d for other network_d. you should edit the .yml network_d to multiscale type
+- e.g. if you want use omnisr as network_g and multiscale as network_d, just edit the .yml 's following part
 ```
 # network structures
 # network_g:
