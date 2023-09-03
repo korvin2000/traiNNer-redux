@@ -1,0 +1,142 @@
+# GENERATE TIME: Sun Sep  3 00:01:38 2023
+# CMD:
+# train.py -opt D:\Users\Sirosky\Jottacloud\Media\Upscaling\Trainers\neosr\options\2x_AnimaG6i14a_Omni.yml --auto_resume
+
+# python -Wi train.py -opt D:\Users\Sirosky\Jottacloud\Media\Upscaling\Trainers\neosr\options\2x_AnimaG6i14a_Omni.yml --auto_resume
+
+name: 2x_AnimaG6i14a_Omni
+model_type: default
+scale: 2
+num_gpu: 1
+use_amp: true
+bfloat16: false
+compile: false
+#manual_seed: 1024
+
+datasets:
+  train:
+    type: paired
+    dataroot_gt: 'D:\Users\Sirosky\Jottacloud\Media\Upscaling\Datasets\[Gen 6] Dataset - Anima\HR - G i14a'
+    dataroot_lq: 'D:\Users\Sirosky\Jottacloud\Media\Upscaling\Datasets\[Gen 6] Dataset - Anima\LR - D'
+    #meta_info: 'datasets/meta_info.txt'
+    io_backend:
+      type: disk
+
+    gt_size: 192
+    batch_size: 12
+    use_hflip: true
+    use_rot: true
+    num_worker_per_gpu: 12
+    dataset_enlarge_ratio: 5
+
+  val:
+    name: Validation
+    type: paired 
+    dataroot_gt: 'D:\Users\Sirosky\Jottacloud\Media\Upscaling\Datasets\Validation\2x_AnimaG6\HR'
+    dataroot_lq: 'D:\Users\Sirosky\Jottacloud\Media\Upscaling\Datasets\Validation\2x_AnimaG6\LR'
+    io_backend:
+      type: disk
+
+
+path:
+  #pretrain_network_g: 'D:\Users\Sirosky\Jottacloud\Media\Upscaling\Models Main\2x_AnimaG6i14_OmniPretrain_55000.pth'
+  #param_key_g: params_ema
+  #strict_load_g: true
+  resume_state: ~ #'D:\Users\Sirosky\Jottacloud\Media\Upscaling\Trainers\neosr\experiments\2x_AnimaG6i14a_Omni\training_states\15000.state'
+
+network_g:
+  type: omnisr 
+  upsampling: 2
+  window_size: 16
+
+network_d:
+  type: unet
+
+#print_network: true
+
+train:
+  optim_g:
+    type: adamw
+    lr: !!float 1e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+    fused: false
+  optim_d:
+    type: adamw
+    lr: !!float 1e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+    fused: false
+
+  scheduler:
+    type: multisteplr
+    milestones: [900000, 950000]
+    gamma: 0.5
+
+  total_iter: 500000
+  warmup_iter: -1  # no warm up
+  ema_decay: 0.999
+
+  # losses
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+  perceptual_opt:
+    type: PerceptualLoss
+    layer_weights:
+      "conv1_2": 0.1
+      "conv2_2": 0.1
+      "conv3_4": 1
+      "conv4_4": 1
+      'conv5_4': 1
+    vgg_type: vgg19
+    use_input_norm: true
+    range_norm: false
+    perceptual_weight: 1.0
+    style_weight: 0
+    criterion: l1
+  gan_opt:
+    type: GANLoss
+    gan_type: vanilla
+    real_label_val: 1.0
+    fake_label_val: 0.0
+    loss_weight: 0.1
+  color_opt:
+    type: colorloss
+    loss_weight: 1.0
+    criterion: l1
+  #ldl_opt:
+    #type: L1Loss
+    #loss_weight: 1.0
+    #reduction: mean
+  #ff_opt:
+  #  type: focalfrequencyloss
+  #  loss_weight: 1.0
+
+  #net_d_iters: 1
+  #net_d_init_iters: 0
+
+logger:
+  print_freq: 100
+  save_checkpoint_freq: 2500
+  use_tb_logger: false
+  #wandb:
+  #  project: ~
+  #  resume_id: ~
+
+# dist training settings
+#dist_params:
+#  backend: nccl
+#  port: 29500
+
+val:
+    val_freq: 5000
+    save_img: true
+    metrics:
+     psnr:
+       type: calculate_psnr
+       crop_border: 4
+     ssim:
+       type: calculate_ssim
+       crop_border: 4
