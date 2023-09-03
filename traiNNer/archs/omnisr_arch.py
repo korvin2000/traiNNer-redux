@@ -879,3 +879,4 @@ class OmniSRNet(nn.Module):
         out = out[:, :, :H*self.up_scale, :W*self.up_scale]
         return  out
 
+
