@@ -143,15 +143,29 @@ class SRGANModel(SRModel):
                         loss_dict['l_g_avg'] = l_g_avg
                     # gan loss
                     fake_g_pred = self.net_d(self.output)
-                    l_g_gan = self.cri_gan(fake_g_pred, True, is_disc=False)
-                    l_g_total += l_g_gan
-                    loss_dict['l_g_gan'] = l_g_gan
+                    if isinstance (fake_g_pred,list) == False:
+                        l_g_gan = self.cri_gan(fake_g_pred, True, is_disc=False)
+                        l_g_total += l_g_gan
+                        loss_dict['l_g_gan'] = l_g_gan
 
-                    scaler.scale(l_g_total).backward()
+                        scaler.scale(l_g_total).backward()
 
-                    scaler.step(self.optimizer_g)
+                        scaler.step(self.optimizer_g)
 
-                    scaler.update()
+                        scaler.update()
+                    else:
+                        fake_g_preds = fake_g_pred
+                        loss_dict['l_g_gan'] = 0
+                        for fake_g_pred in fake_g_preds:
+                            l_g_gan = self.cri_gan(fake_g_pred, True, is_disc=False)
+                            l_g_total += l_g_gan
+                            loss_dict['l_g_gan'] += l_g_gan
+
+                        scaler.scale(l_g_total).backward()
+
+                        scaler.step(self.optimizer_g)
+
+                        scaler.update()
 
         else:
             self.output = self.net_g(self.lq)
@@ -187,12 +201,25 @@ class SRGANModel(SRModel):
                     loss_dict['l_g_avg'] = l_g_avg
                 # gan loss
                 fake_g_pred = self.net_d(self.output)
-                l_g_gan = self.cri_gan(fake_g_pred, True, is_disc=False)
-                l_g_total += l_g_gan
-                loss_dict['l_g_gan'] = l_g_gan
+                if isinstance (fake_g_pred,list) == False:
+                    l_g_gan = self.cri_gan(fake_g_pred, True, is_disc=False)
+                    l_g_total += l_g_gan
+                    loss_dict['l_g_gan'] = l_g_gan
 
-                l_g_total.backward()
-                self.optimizer_g.step()
+                    l_g_total.backward()
+                    self.optimizer_g.step()
+
+                else:
+                    fake_g_preds = fake_g_pred
+                    loss_dict['l_g_gan'] = 0
+                    for fake_g_pred in fake_g_preds:
+                        l_g_gan = self.cri_gan(fake_g_pred, True, is_disc=False)
+                        l_g_total += l_g_gan
+                        loss_dict['l_g_gan'] += l_g_gan
+
+                    l_g_total.backward()
+                    self.optimizer_g.step()
+
         # optimize net_d
         for p in self.net_d.parameters():
             p.requires_grad = True
@@ -203,36 +230,86 @@ class SRGANModel(SRModel):
             if autoamp_g==True:
                 self.output=self.output.float()
             real_d_pred = self.net_d(self.gt)
-            l_d_real = self.cri_gan(real_d_pred, True, is_disc=True)
-            loss_dict['l_d_real'] = l_d_real
-            loss_dict['out_d_real'] = torch.mean(real_d_pred.detach())
-            l_d_real.backward()
-            # fake
-            fake_d_pred = self.net_d(self.output.detach())
-            l_d_fake = self.cri_gan(fake_d_pred, False, is_disc=True)
-            loss_dict['l_d_fake'] = l_d_fake
-            loss_dict['out_d_fake'] = torch.mean(fake_d_pred.detach())
-            l_d_fake.backward()
-            self.optimizer_d.step()
-
-            self.log_dict = self.reduce_loss_dict(loss_dict)
-        else:
-            with autocast():
-                real_d_pred = self.net_d(self.gt)
+            if isinstance (real_d_pred,list) == False:
                 l_d_real = self.cri_gan(real_d_pred, True, is_disc=True)
                 loss_dict['l_d_real'] = l_d_real
                 loss_dict['out_d_real'] = torch.mean(real_d_pred.detach())
-                scaler.scale(l_d_real).backward()
-
+                l_d_real.backward()
                 # fake
                 fake_d_pred = self.net_d(self.output.detach())
                 l_d_fake = self.cri_gan(fake_d_pred, False, is_disc=True)
                 loss_dict['l_d_fake'] = l_d_fake
                 loss_dict['out_d_fake'] = torch.mean(fake_d_pred.detach())
-                scaler.scale(l_d_fake).backward()
+                l_d_fake.backward()
+            else:
+                # real
+                real_d_preds = real_d_pred
+                loss_dict['l_d_real'] = 0
+                loss_dict['out_d_real'] = 0
+                l_d_real_tot = 0
+                for real_d_pred in real_d_preds:
+                    l_d_real = self.cri_gan(real_d_pred, True, is_disc=True)
+                    l_d_real_tot += l_d_real
+                    loss_dict['l_d_real'] += l_d_real
+                    loss_dict['out_d_real'] += torch.mean(real_d_pred.detach())
+                l_d_real_tot.backward()
+                # fake
+                loss_dict['l_d_fake'] = 0
+                loss_dict['out_d_fake'] = 0
+                l_d_fake_tot = 0
+                fake_d_preds = self.net_d(self.output.detach().clone())  # clone for pt1.9
+                for fake_d_pred in fake_d_preds:
+                    l_d_fake = self.cri_gan(fake_d_pred, False, is_disc=True)
+                    l_d_fake_tot += l_d_fake
+                    loss_dict['l_d_fake'] += l_d_fake
+                    loss_dict['out_d_fake'] += torch.mean(fake_d_pred.detach())
+                l_d_fake_tot.backward()
+
+            self.optimizer_d.step()
+
+            self.log_dict = self.reduce_loss_dict(loss_dict)
+        else:
+            with autocast():
+
+                real_d_pred = self.net_d(self.gt)
+                if isinstance (real_d_pred,list) == False:
+                    l_d_real = self.cri_gan(real_d_pred, True, is_disc=True)
+                    loss_dict['l_d_real'] = l_d_real
+                    loss_dict['out_d_real'] = torch.mean(real_d_pred.detach())
+                    scaler.scale(l_d_real).backward()
+                    # fake
+                    fake_d_pred = self.net_d(self.output.detach())
+                    l_d_fake = self.cri_gan(fake_d_pred, False, is_disc=True)
+                    loss_dict['l_d_fake'] = l_d_fake
+                    loss_dict['out_d_fake'] = torch.mean(fake_d_pred.detach())
+                    scaler.scale(l_d_fake).backward()
+
+                else:
+                    # real
+                    real_d_preds = real_d_pred
+                    loss_dict['l_d_real'] = 0
+                    loss_dict['out_d_real'] = 0
+                    l_d_real_tot = 0
+                    for real_d_pred in real_d_preds:
+                        l_d_real = self.cri_gan(real_d_pred, True, is_disc=True)
+                        l_d_real_tot += l_d_real
+                        loss_dict['l_d_real'] += l_d_real
+                        loss_dict['out_d_real'] += torch.mean(real_d_pred.detach())
+                    scaler.scale(l_d_real_tot).backward()
+                    # fake
+                    loss_dict['l_d_fake'] = 0
+                    loss_dict['out_d_fake'] = 0
+                    l_d_fake_tot = 0
+                    fake_d_preds = self.net_d(self.output.detach().clone())  # clone for pt1.9
+                    for fake_d_pred in fake_d_preds:
+                        l_d_fake = self.cri_gan(fake_d_pred, False, is_disc=True)
+                        l_d_fake_tot += l_d_fake
+                        loss_dict['l_d_fake'] += l_d_fake
+                        loss_dict['out_d_fake'] += torch.mean(fake_d_pred.detach())
+                    scaler.scale(l_d_fake_tot).backward()
+
                 scaler.step(self.optimizer_d)
                 scaler.update()
-
                 self.log_dict = self.reduce_loss_dict(loss_dict)
 
         if self.ema_decay > 0:
