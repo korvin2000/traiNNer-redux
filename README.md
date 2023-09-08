@@ -1,4 +1,4 @@
-(Fork of BasicSR joeyballentine/traiNNer-redux) Open Source Image and Video Restoration Toolbox for Super-resolution, Denoise, Deblurring, etc. Currently, it includes EDSR, RCAN, SRResNet, SRGAN, ESRGAN, EDVR, BasicVSR, SwinIR, ECBSR, OmniSR, HAT, GRL, A-ESRGAN, DAT, WaveMixSR, StarSRGAN, DLGSANet etc. Also support StyleGAN2, DFDNet.
+(Fork of BasicSR joeyballentine/traiNNer-redux) Open Source Image and Video Restoration Toolbox for Super-resolution, Denoise, Deblurring, etc. Currently, it includes EDSR, RCAN, SRResNet, SRGAN, ESRGAN, EDVR, BasicVSR, SwinIR, ECBSR, OmniSR, HAT, GRL, A-ESRGAN, DAT, WaveMixSR, StarSRGAN, DLGSANet, DITN etc. Also support StyleGAN2, DFDNet.
 
 ***************************
 NEW ADD ARCH SUPPORT
@@ -23,6 +23,8 @@ NEW ADD ARCH SUPPORT
   - The arch implementation of StarSRGAN is from [StarSRGAN](https://github.com/kynthesis/StarSRGAN). The LICENSE of StarSRGAN is [Apache License 2.0].
 - [DLGSANet](https://github.com/NeonLeexiang/DLGSANet)
   - The arch implementation of DLGSANet is from [DLGSANet](https://github.com/NeonLeexiang/DLGSANet). The LICENSE of DLGSANet is [Apache License 2.0].
+- [DITN](https://github.com/yongliuy/DITN)
+  - The arch implementation of DITN is from [DITN](https://github.com/yongliuy/DITN). 
 
 ***************************
 NEW FEATURE SUPPORT
@@ -141,4 +143,17 @@ network_g:
   body_norm: false
   img_range: 1.
   upsampler: 'pixelshuffledirect'
+
+  type: DITN # need torch >2.0
+  inp_channels: 3
+  dim:  60
+  ITL_blocks:  4
+  SAL_blocks:  4
+  UFONE_blocks:  1
+  ffn_expansion_factor:  2
+  bias:  False
+  LayerNorm_type:  'WithBias'
+  patch_size: 8
+  upscale: 4
+
 ```
