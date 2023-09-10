@@ -1,3 +1,20 @@
+After some testing I found the optimal learning rate for Adan on DAT is between 8e-4 and 9e-4:
+train:
+  optim_g:
+    type: adan
+    lr: !!float 9e-4
+    weight_decay: 0.01
+    weight_decouple: true
+    use_gc: true
+  optim_d:
+    type: adan
+    lr: !!float 9e-4
+    weight_decay: 0.01
+    weight_decouple: true
+    use_gc: true
+
+
+
 # losses
   pixel_opt:
     type: L1Loss
